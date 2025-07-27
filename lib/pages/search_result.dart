@@ -59,44 +59,89 @@ class _SearchResultPageState extends State<SearchResultPage> {
                     : const Icon(Icons.book),
             title: Text(book.title),
             subtitle: Text(book.authors.join(', ')),
-            trailing: Container(
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.circular(5),
-              ),
-              child: IconButton(
-                icon: const Icon(Icons.add),
-                onPressed: () {
-                  if (!userLibrary.any((b) => b.id == book.id)) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        duration: const Duration(milliseconds: 700),
-                        content: Text('${book.title} added to your library'),
+            trailing:
+                (!userLibrary.any((b) => b.id == book.id))
+                    ? Container(
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(5),
                       ),
-                    );
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        duration: const Duration(milliseconds: 700),
-                        content: Text(
-                          '${book.title} is already in your library',
-                        ),
+                      child: IconButton(
+                        icon: const Icon(Icons.add),
+                        onPressed: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              duration: const Duration(milliseconds: 700),
+                              content: Text(
+                                '${book.title} added to your library',
+                              ),
+                            ),
+                          );
+                          provider.addToLibrary(
+                            BooksHiveModel(
+                              id: book.id,
+                              title: book.title,
+                              authors: book.authors,
+                              description: book.description,
+                              thumbnail: book.thumbnail,
+                              addedAt: book.addedAt,
+                            ),
+                          );
+                        },
                       ),
-                    );
-                  }
-                  provider.addToLibrary(
-                    BooksHiveModel(
-                      id: book.id,
-                      title: book.title,
-                      authors: book.authors,
-                      description: book.description,
-                      thumbnail: book.thumbnail,
-                      addedAt: book.addedAt,
+                    )
+                    : Container(
+                      decoration: BoxDecoration(
+                        color: Colors.green[200],
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: IconButton(
+                        icon: const Icon(Icons.check),
+                        onPressed: () async {
+                          final confirm = await showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: const Text('Remove Book?'),
+                                content: Text(
+                                  'Do you want to remove ${book.title} from your library?',
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed:
+                                        () => Navigator.of(context).pop(false),
+                                    child: const Text('Cancel'),
+                                  ),
+                                  TextButton(
+                                    onPressed:
+                                        () => Navigator.of(context).pop(true),
+                                    child: const Text('Remove'),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+
+                          if (confirm == true) {
+                            provider.removeFromLibrary(book.id);
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  duration: Duration(milliseconds: 500),
+                                  content: Text(
+                                    '${book.title} removed from library',
+                                  ),
+                                ),
+                              );
+                            } else {
+                              return;
+                            }
+                          } else {
+                            return;
+                          }
+                        },
+                      ),
                     ),
-                  );
-                },
-              ),
-            ),
           );
         },
       ),

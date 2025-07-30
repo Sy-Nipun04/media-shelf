@@ -57,7 +57,11 @@ class _SearchResultPageState extends State<SearchResultPage> {
                       fit: BoxFit.cover,
                     )
                     : const Icon(Icons.book),
-            title: Text(book.title),
+            title: Text(
+              book.title,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
             subtitle: Text(book.authors.join(', ')),
             trailing:
                 (!userLibrary.any((b) => b.id == book.id))

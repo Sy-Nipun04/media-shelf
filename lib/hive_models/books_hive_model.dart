@@ -23,12 +23,33 @@ class BooksHiveModel extends HiveObject {
   DateTime addedAt;
 
   @HiveField(6)
-  int? rating;
+  String? publishedDate;
 
   @HiveField(7)
-  String? note;
+  String? publisher;
 
   @HiveField(8)
+  int? pageCount;
+
+  @HiveField(9)
+  String? mainCategory;
+
+  @HiveField(10)
+  List<String> category;
+
+  @HiveField(11)
+  String language;
+
+  @HiveField(12)
+  List<String> isbn;
+
+  @HiveField(12)
+  int? rating;
+
+  @HiveField(13)
+  String? note;
+
+  @HiveField(14)
   bool favourite = false;
 
   BooksHiveModel({
@@ -38,6 +59,13 @@ class BooksHiveModel extends HiveObject {
     required this.description,
     required this.thumbnail,
     required this.addedAt,
+    this.publishedDate,
+    this.publisher,
+    this.pageCount,
+    this.mainCategory,
+    this.category = const [],
+    this.language = '',
+    this.isbn = const [],
     this.rating,
     this.note,
     this.favourite = false,

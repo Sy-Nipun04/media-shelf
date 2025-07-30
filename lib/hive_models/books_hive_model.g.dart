@@ -26,8 +26,16 @@ class BooksHiveModelAdapter extends TypeAdapter<BooksHiveModel> {
           fields[5] != null
               ? DateTime.parse(fields[5] as String)
               : DateTime.now(),
-      rating: fields[6] as int?,
-      note: fields[7] as String?,
+      publishedDate: fields[6] as String?,
+      publisher: fields[7] as String?,
+      pageCount: fields[8] as int?,
+      mainCategory: fields[9] as String?,
+      category: (fields[10] != null) ? (fields[10] as List).cast<String>() : [],
+      language: fields[11] as String? ?? '',
+      isbn: (fields[12] as List?)?.cast<String>() ?? [],
+      rating: fields[13] as int?,
+      note: fields[14] as String?,
+      favourite: fields[15] as bool? ?? false,
     );
   }
 

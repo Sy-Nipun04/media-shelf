@@ -30,8 +30,16 @@ class BooksProvider extends ChangeNotifier {
                 description: hiveModel.description,
                 thumbnail: hiveModel.thumbnail,
                 addedAt: hiveModel.addedAt,
+                publishedDate: hiveModel.publishedDate,
+                publisher: hiveModel.publisher,
+                pageCount: hiveModel.pageCount,
+                mainCategory: hiveModel.mainCategory,
+                category: hiveModel.category,
+                language: hiveModel.language,
+                isbn: hiveModel.isbn,
                 rating: hiveModel.rating,
                 note: hiveModel.note,
+                favourite: hiveModel.favourite,
               ),
             )
             .toList();
@@ -140,5 +148,62 @@ class BooksProvider extends ChangeNotifier {
       userLibrary.sort((a, b) => a.title.compareTo(b.title));
     }
     notifyListeners();
+  }
+
+  bool isBookInFavorites(Book book) {
+    return userLibrary.any((b) => b.id == book.id && b.favourite);
+  }
+
+  void toggleFavorite(Book book) {
+    final index = userLibrary.indexWhere((b) => b.id == book.id);
+    if (index != -1) {
+      userLibrary[index].favourite = !userLibrary[index].favourite;
+      booksBox.put(
+        book.id,
+        BooksHiveModel(
+          id: book.id,
+          title: book.title,
+          authors: book.authors,
+          description: book.description,
+          thumbnail: book.thumbnail,
+          addedAt: book.addedAt,
+          rating: book.rating,
+          note: book.note,
+          favourite: userLibrary[index].favourite,
+        ),
+      );
+      notifyListeners();
+    }
+  }
+
+  // Get the selected book for details page
+  Book get selectedBookFromLibrary {
+    return userLibrary.firstWhere(
+      (book) => book.id == lastQuery,
+      orElse:
+          () => Book(
+            id: '',
+            title: 'Unknown',
+            authors: [],
+            description: '',
+            thumbnail: '',
+            addedAt: DateTime.now(),
+          ),
+    );
+  }
+
+  Book get selectedBookFromSearch {
+    return searchResults.firstWhere(
+      (book) => book.id == lastQuery,
+      orElse:
+          () => Book(
+            id: '',
+            title: 'Unknown',
+            authors: [],
+            description: '',
+            thumbnail: '',
+            addedAt: DateTime.now(),
+          ),
+    );
   }
 }

@@ -34,12 +34,9 @@ class MyApp extends StatelessWidget {
 }
 
 //Next steps:
-// 1. (Done)Sorting and filtering functionality for books (favorites, recently added, author, etc.)
-// 2. (Done)Add a search bar to find books quickly in library (by title, author, etc.)
-// 2. (Done)Check reason for crashing when searching for books
-// 3. Implement a detailed view for each book with more information
-// 4. Add a favorites section for books
-// 5. Change main UI
+// 1. Create UI for the home page
+// 2. Implement a detailed view for each book with more information with notes and ratings
+// 3. Add filters for books in Library(favourites, read, to read)
 
 //Ideas for the app:
 // 1. use apis from rawg, tmdb, google books to fetch data
@@ -47,7 +44,7 @@ class MyApp extends StatelessWidget {
 // 3. add currently, playing movies, games, books
 // 4. add previously played movies, games, books
 // 5. (Done)add movies, games, books to your watch/play/read list
-// 6. add movie, game, book details page
+// 6. (Done)add movie, game, book details page
 // 8. (Done)add movie, game, book search functionality
 // 9. add a favorites section
 // 10. add notes, reviews, ratings for movies, games, books

@@ -322,7 +322,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
           children: [
             GestureDetector(
               onTap: () {
-                bookPopUpLibrary(context, book, library, provider);
+                bookPopUpInfo(context, book, library, provider);
               },
               child: Container(
                 color: Color.fromRGBO(0xf7, 0xf8, 0xf8, 0.5),
@@ -417,7 +417,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
           children: [
             GestureDetector(
               onTap: () {
-                bookPopUpLibrary(context, book, library, provider);
+                bookPopUpInfo(context, book, library, provider);
               },
               child: Container(
                 color: Color.fromRGBO(0xf7, 0xf8, 0xf8, 0.5),

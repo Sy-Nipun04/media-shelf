@@ -206,4 +206,13 @@ class BooksProvider extends ChangeNotifier {
           ),
     );
   }
+
+  void updateBookNote(String bookId, String note) {
+    final book = booksBox.get(bookId);
+    if (book != null) {
+      book.note = note;
+      book.save();
+      loadLibrary();
+    }
+  }
 }

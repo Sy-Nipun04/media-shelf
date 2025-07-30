@@ -36,8 +36,10 @@ class MyApp extends StatelessWidget {
 //Next steps:
 // 1. Create UI for the home page
 // 2. Implement a detailed view for each book with more information with notes and ratings
-// 3. Features to add note and ratings
+// 3. (Done)Feature to add notes.
+// 4. Features to add ratings.
 // 4. Add filters for books in Library(favourites, read, to read)
+// 5. Pop Up info for search results
 
 //Ideas for the app:
 // 1. use apis from rawg, tmdb, google books to fetch data

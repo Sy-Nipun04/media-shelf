@@ -111,6 +111,37 @@ Future<dynamic> bookPopUpInfo(
                     ),
                     Consumer<BooksProvider>(
                       builder: (context, provider, child) {
+                        final isFavourite = userLibrary.any(
+                          (b) => b.id == book.id && b.favourite,
+                        );
+                        return Container(
+                          height: 30,
+                          width: 30,
+                          decoration: BoxDecoration(
+                            color:
+                                isFavourite
+                                    ? const Color.fromARGB(255, 255, 183, 0)
+                                    : Colors.grey[200],
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          child: IconButton(
+                            padding: EdgeInsets.zero,
+                            icon: Icon(
+                              Icons.star,
+                              color: isFavourite ? Colors.white : Colors.grey,
+                              size: 20,
+                            ),
+                            onPressed: () {
+                              isFavourite
+                                  ? provider.toggleFavorite(book)
+                                  : provider.toggleFavorite(book);
+                            },
+                          ),
+                        );
+                      },
+                    ),
+                    Consumer<BooksProvider>(
+                      builder: (context, provider, child) {
                         final isInLibrary = userLibrary.any(
                           (b) => b.id == book.id,
                         );
@@ -130,8 +161,73 @@ Future<dynamic> bookPopUpInfo(
                               isInLibrary ? Icons.check : Icons.add,
                               size: 20,
                             ),
-                            onPressed: () {
-                              // Add/Remove logic here...
+                            onPressed: () async {
+                              if (isInLibrary) {
+                                final confirm = await showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      title: const Text('Remove Book?'),
+                                      content: Text(
+                                        'Do you want to remove ${book.title} from your library?',
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed:
+                                              () => Navigator.of(
+                                                context,
+                                              ).pop(false),
+                                          child: const Text('Cancel'),
+                                        ),
+                                        TextButton(
+                                          onPressed:
+                                              () => Navigator.of(
+                                                context,
+                                              ).pop(true),
+                                          child: const Text('Remove'),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+
+                                if (confirm == true) {
+                                  provider.removeFromLibrary(book.id);
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        duration: Duration(milliseconds: 500),
+                                        content: Text(
+                                          '${book.title} removed from library',
+                                        ),
+                                      ),
+                                    );
+                                  } else {
+                                    return;
+                                  }
+                                } else {
+                                  return;
+                                }
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    duration: const Duration(milliseconds: 700),
+                                    content: Text(
+                                      '${book.title} added to your library',
+                                    ),
+                                  ),
+                                );
+                                provider.addToLibrary(
+                                  BooksHiveModel(
+                                    id: book.id,
+                                    title: book.title,
+                                    authors: book.authors,
+                                    description: book.description,
+                                    thumbnail: book.thumbnail,
+                                    addedAt: book.addedAt,
+                                  ),
+                                );
+                              }
                             },
                           ),
                         );
@@ -142,6 +238,7 @@ Future<dynamic> bookPopUpInfo(
                 const SizedBox(height: 10),
 
                 Container(
+                  width: double.infinity,
                   padding: const EdgeInsets.all(8),
                   constraints: BoxConstraints(
                     maxHeight: 135,

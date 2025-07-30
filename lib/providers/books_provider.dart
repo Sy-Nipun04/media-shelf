@@ -154,10 +154,12 @@ class BooksProvider extends ChangeNotifier {
     return userLibrary.any((b) => b.id == book.id && b.favourite);
   }
 
-  void toggleFavorite(Book book) {
+  bool toggleFavorite(Book book) {
     final index = userLibrary.indexWhere((b) => b.id == book.id);
+    bool isFavourite = false;
     if (index != -1) {
       userLibrary[index].favourite = !userLibrary[index].favourite;
+      isFavourite = userLibrary[index].favourite;
       booksBox.put(
         book.id,
         BooksHiveModel(
@@ -174,37 +176,7 @@ class BooksProvider extends ChangeNotifier {
       );
       notifyListeners();
     }
-  }
-
-  // Get the selected book for details page
-  Book get selectedBookFromLibrary {
-    return userLibrary.firstWhere(
-      (book) => book.id == lastQuery,
-      orElse:
-          () => Book(
-            id: '',
-            title: 'Unknown',
-            authors: [],
-            description: '',
-            thumbnail: '',
-            addedAt: DateTime.now(),
-          ),
-    );
-  }
-
-  Book get selectedBookFromSearch {
-    return searchResults.firstWhere(
-      (book) => book.id == lastQuery,
-      orElse:
-          () => Book(
-            id: '',
-            title: 'Unknown',
-            authors: [],
-            description: '',
-            thumbnail: '',
-            addedAt: DateTime.now(),
-          ),
-    );
+    return isFavourite;
   }
 
   void updateBookNote(String bookId, String note) {

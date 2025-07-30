@@ -83,7 +83,9 @@ Future<dynamic> bookPopUpLibrary(
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.grey[600],
+                            overflow: TextOverflow.ellipsis,
                           ),
+                          maxLines: 3,
                         ),
                         SizedBox(height: 10),
                       ],
@@ -245,7 +247,7 @@ Future<dynamic> bookPopUpLibrary(
                                 style: TextStyle(
                                   fontSize: 12,
                                   color:
-                                      (book.note == null)
+                                      (book.description == '')
                                           ? Colors.grey
                                           : Colors.black,
                                 ),

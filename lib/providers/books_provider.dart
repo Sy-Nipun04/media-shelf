@@ -10,11 +10,36 @@ class BooksProvider extends ChangeNotifier {
   String lastQuery = '';
   String currentSortOption = 'Recently Added';
   String get sortOption => currentSortOption;
+  String currentFilter = 'None';
   bool isLoading = false;
 
   List<Book> searchResults = [];
   List<Book> userLibrary = [];
   List<Book> searchLibraryResults = [];
+
+  void setFilter(String filter) {
+    currentFilter = filter;
+    notifyListeners();
+  }
+
+  List<Book> get filteredLibrary {
+    switch (currentFilter) {
+      case 'None':
+        return userLibrary;
+      case 'Favourites':
+        return userLibrary.where((b) => b.favourite).toList();
+      case 'Reading':
+        return userLibrary.where((b) => b.readingStatus == 'Reading').toList();
+      case 'To Read':
+        return userLibrary.where((b) => b.readingStatus == 'To Read').toList();
+      case 'Read':
+        return userLibrary.where((b) => b.readingStatus == 'Read').toList();
+      case 'Unread':
+        return userLibrary.where((b) => b.readingStatus == 'Unread').toList();
+      default:
+        return userLibrary;
+    }
+  }
 
   final Box<BooksHiveModel> booksBox = Hive.box<BooksHiveModel>('booksBox');
 

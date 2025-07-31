@@ -51,9 +51,11 @@ class _LibraryScreenState extends State<LibraryScreen> {
   Widget build(BuildContext context) {
     final provider = Provider.of<BooksProvider>(context);
     final library =
-        provider.searchLibraryResults.isNotEmpty
-            ? provider.searchLibraryResults
-            : provider.userLibrary;
+        provider.currentFilter == 'None'
+            ? (provider.searchLibraryResults.isNotEmpty
+                ? provider.searchLibraryResults
+                : provider.userLibrary)
+            : provider.filteredLibrary;
 
     return Scaffold(
       appBar: appBar1(context),
@@ -66,7 +68,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
             Expanded(
               child:
                   library.isEmpty
-                      ? const Center(child: Text('No books added yet'))
+                      ? const Center(child: Text('Nothing to show here :('))
                       : (isGrid
                           ? libraryGrid(library, provider, context)
                           : libraryList(library, provider, context)),
@@ -121,14 +123,41 @@ class _LibraryScreenState extends State<LibraryScreen> {
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8),
-                    child: IconButton(
-                      icon: Icon(
+                    child: PopupMenuButton<String>(
+                      icon: const Icon(
                         Icons.tune,
                         color: Color.fromARGB(255, 153, 153, 153),
                       ),
-                      onPressed: () {
-                        sortBottomSheet(context, provider);
+                      onSelected: (value) {
+                        if (value == 'Sort') {
+                          sortBottomSheet(context, provider);
+                        } else if (value == 'Filters') {
+                          filtersBottomSheet(context, provider);
+                        }
                       },
+                      itemBuilder:
+                          (BuildContext context) => [
+                            const PopupMenuItem(
+                              value: 'Sort',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.sort, color: Colors.grey),
+                                  SizedBox(width: 10),
+                                  Text('Sort'),
+                                ],
+                              ),
+                            ),
+                            const PopupMenuItem(
+                              value: 'Filters',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.filter_list, color: Colors.grey),
+                                  SizedBox(width: 10),
+                                  Text('Filters'),
+                                ],
+                              ),
+                            ),
+                          ],
                     ),
                   ),
                 ],
@@ -229,6 +258,167 @@ class _LibraryScreenState extends State<LibraryScreen> {
                     },
                     trailing:
                         provider.sortOption == 'Author'
+                            ? const Icon(Icons.check, color: Colors.blue)
+                            : null,
+                  ),
+                  const SizedBox(height: 24),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.black,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(24),
+                        ),
+                      ),
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text(
+                        'Done',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<dynamic> filtersBottomSheet(
+    BuildContext context,
+    BooksProvider provider,
+  ) {
+    return showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      isScrollControlled: true,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 40,
+                    height: 4,
+                    margin: const EdgeInsets.only(bottom: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  Row(
+                    children: const [
+                      Icon(Icons.arrow_back),
+                      SizedBox(width: 12),
+                      Text(
+                        'Filters',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  ListTile(
+                    leading: const Icon(Icons.block, color: Colors.black),
+                    title: const Text('None'),
+                    onTap: () {
+                      setState(() {
+                        provider.setFilter('None');
+                      });
+                    },
+                    trailing:
+                        provider.currentFilter == 'None'
+                            ? const Icon(Icons.check, color: Colors.blue)
+                            : null,
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.star, color: Colors.orange),
+                    title: const Text('Favourites'),
+                    onTap: () {
+                      setState(() {
+                        provider.setFilter('Favourites');
+                      });
+                    },
+                    trailing:
+                        provider.currentFilter == 'Favourites'
+                            ? const Icon(Icons.check, color: Colors.blue)
+                            : null,
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.book, color: Colors.blue),
+                    title: const Text(
+                      'Reading',
+                      style: TextStyle(color: Colors.blue),
+                    ),
+                    onTap: () {
+                      setState(() {
+                        provider.setFilter('Reading');
+                      });
+                    },
+                    trailing:
+                        provider.currentFilter == 'Reading'
+                            ? const Icon(Icons.check, color: Colors.blue)
+                            : null,
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.book, color: Colors.orangeAccent),
+                    title: const Text(
+                      'To Read',
+                      style: TextStyle(color: Colors.orangeAccent),
+                    ),
+                    onTap: () {
+                      setState(() {
+                        provider.setFilter('To Read');
+                      });
+                    },
+                    trailing:
+                        provider.currentFilter == 'To Read'
+                            ? const Icon(Icons.check, color: Colors.blue)
+                            : null,
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.book, color: Colors.green),
+                    title: const Text(
+                      'Read',
+                      style: TextStyle(color: Colors.green),
+                    ),
+                    onTap: () {
+                      setState(() {
+                        provider.setFilter('Read');
+                      });
+                    },
+                    trailing:
+                        provider.currentFilter == 'Read'
+                            ? const Icon(Icons.check, color: Colors.blue)
+                            : null,
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.book, color: Colors.grey),
+                    title: const Text(
+                      'Unread',
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                    onTap: () {
+                      setState(() {
+                        provider.setFilter('Unread');
+                      });
+                    },
+                    trailing:
+                        provider.currentFilter == 'Unread'
                             ? const Icon(Icons.check, color: Colors.blue)
                             : null,
                   ),

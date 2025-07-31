@@ -3,10 +3,13 @@ import '../models/books_model.dart';
 import '../services/books_service.dart';
 import 'package:project_1/hive_models/books_hive_model.dart';
 import 'package:hive/hive.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class BooksProvider extends ChangeNotifier {
   final Map<String, List<Book>> cache = {};
   String lastQuery = '';
+  String currentSortOption = 'Recently Added';
+  String get sortOption => currentSortOption;
   bool isLoading = false;
 
   List<Book> searchResults = [];
@@ -16,10 +19,15 @@ class BooksProvider extends ChangeNotifier {
   final Box<BooksHiveModel> booksBox = Hive.box<BooksHiveModel>('booksBox');
 
   BooksProvider() {
-    loadLibrary();
+    _initProvider();
   }
 
-  void loadLibrary() async {
+  Future<void> _initProvider() async {
+    await loadSortPreference();
+    await loadLibrary();
+  }
+
+  Future<void> loadLibrary() async {
     userLibrary =
         booksBox.values
             .map(
@@ -40,9 +48,12 @@ class BooksProvider extends ChangeNotifier {
                 rating: hiveModel.rating,
                 note: hiveModel.note,
                 favourite: hiveModel.favourite,
+                readingStatus: hiveModel.readingStatus,
               ),
             )
             .toList();
+
+    await sortLibrary(currentSortOption, notify: false);
     notifyListeners();
   }
 
@@ -50,7 +61,6 @@ class BooksProvider extends ChangeNotifier {
     if (isLoading) return;
 
     final trimmedQuery = query.trim();
-
     if (trimmedQuery.isEmpty || trimmedQuery == lastQuery) return;
 
     isLoading = true;
@@ -58,19 +68,14 @@ class BooksProvider extends ChangeNotifier {
 
     lastQuery = trimmedQuery;
 
-    // Check if result is already cached
     if (cache.containsKey(trimmedQuery)) {
       searchResults = cache[trimmedQuery]!;
-      isLoading = false;
-      notifyListeners();
-      return;
+    } else {
+      searchResults = await BookService.searchBooks(trimmedQuery);
+      if (cache.length >= 50) cache.remove(cache.keys.first);
+      cache[trimmedQuery] = searchResults;
     }
 
-    searchResults = await BookService.searchBooks(trimmedQuery);
-    if (cache.length >= 50) {
-      cache.remove(cache.keys.first);
-    }
-    cache[trimmedQuery] = searchResults;
     isLoading = false;
     notifyListeners();
   }
@@ -78,36 +83,17 @@ class BooksProvider extends ChangeNotifier {
   Future<void> addToLibrary(BooksHiveModel book) async {
     if (!booksBox.containsKey(book.id)) {
       await booksBox.put(book.id, book);
-      userLibrary.add(
-        Book(
-          id: book.id,
-          title: book.title,
-          authors: book.authors,
-          description: book.description,
-          thumbnail: book.thumbnail,
-          rating: book.rating,
-          note: book.note,
-          addedAt: DateTime.now(),
-        ),
-      );
+      await loadLibrary();
+      searchLibraryResults = [];
       notifyListeners();
     }
   }
 
   Future<void> removeFromLibrary(String bookId) async {
     await booksBox.delete(bookId);
-    userLibrary.removeWhere((b) => b.id == bookId);
+    await loadLibrary();
+    searchLibraryResults = [];
     notifyListeners();
-  }
-
-  Future<void> updateBook(String bookId, {int? rating, String? notes}) async {
-    final book = booksBox.get(bookId);
-    if (book != null) {
-      if (rating != null) book.rating = rating;
-      if (notes != null) book.note = notes;
-      await book.save();
-      loadLibrary();
-    }
   }
 
   Future<void> searchLibrary(String query) async {
@@ -129,7 +115,19 @@ class BooksProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> sortLibrary(String criteria) async {
+  Future<void> loadSortPreference() async {
+    final prefs = await SharedPreferences.getInstance();
+    currentSortOption = prefs.getString('sortBy') ?? 'Recently Added';
+  }
+
+  Future<void> setSortOption(String option) async {
+    currentSortOption = option;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('sortBy', option);
+    await sortLibrary(option);
+  }
+
+  Future<void> sortLibrary(String criteria, {bool notify = true}) async {
     if (criteria == 'Title') {
       userLibrary.sort((a, b) => a.title.compareTo(b.title));
     } else if (criteria == 'Author') {
@@ -137,17 +135,13 @@ class BooksProvider extends ChangeNotifier {
         (a, b) => a.authors.join(', ').compareTo(b.authors.join(', ')),
       );
     } else if (criteria == 'Rating') {
-      userLibrary.sort((a, b) {
-        final aRating = a.rating ?? 0;
-        final bRating = b.rating ?? 0;
-        return bRating.compareTo(aRating);
-      });
-    } else if (criteria == 'Recently Added') {
-      userLibrary.sort((a, b) => b.addedAt.compareTo(a.addedAt));
+      userLibrary.sort((a, b) => (b.rating ?? 0).compareTo(a.rating ?? 0));
     } else {
-      userLibrary.sort((a, b) => a.title.compareTo(b.title));
+      // Recently Added
+      userLibrary.sort((a, b) => b.addedAt.compareTo(a.addedAt));
     }
-    notifyListeners();
+
+    if (notify) notifyListeners();
   }
 
   bool isBookInFavorites(Book book) {
@@ -156,35 +150,59 @@ class BooksProvider extends ChangeNotifier {
 
   bool toggleFavorite(Book book) {
     final index = userLibrary.indexWhere((b) => b.id == book.id);
-    bool isFavourite = false;
     if (index != -1) {
-      userLibrary[index].favourite = !userLibrary[index].favourite;
-      isFavourite = userLibrary[index].favourite;
-      booksBox.put(
-        book.id,
-        BooksHiveModel(
-          id: book.id,
-          title: book.title,
-          authors: book.authors,
-          description: book.description,
-          thumbnail: book.thumbnail,
-          addedAt: book.addedAt,
-          rating: book.rating,
-          note: book.note,
-          favourite: userLibrary[index].favourite,
-        ),
-      );
+      final updatedFavorite = !userLibrary[index].favourite;
+      final hiveBook = booksBox.get(book.id);
+      if (hiveBook != null) {
+        hiveBook.favourite = updatedFavorite;
+        hiveBook.save();
+      }
+      userLibrary[index].favourite = updatedFavorite;
       notifyListeners();
+      return updatedFavorite;
     }
-    return isFavourite;
+    return false;
   }
 
-  void updateBookNote(String bookId, String note) {
+  Future<void> updateBookNote(String bookId, String note) async {
     final book = booksBox.get(bookId);
     if (book != null) {
       book.note = note;
-      book.save();
-      loadLibrary();
+      await book.save();
+
+      final index = userLibrary.indexWhere((b) => b.id == bookId);
+      if (index != -1) {
+        userLibrary[index].note = note;
+        notifyListeners();
+      }
+    }
+  }
+
+  Future<void> updateBookRating(String bookId, int? rating) async {
+    final book = booksBox.get(bookId);
+    if (book != null) {
+      book.rating = rating;
+      await book.save();
+
+      final index = userLibrary.indexWhere((b) => b.id == bookId);
+      if (index != -1) {
+        userLibrary[index].rating = rating;
+        notifyListeners();
+      }
+    }
+  }
+
+  Future<void> updateBookReadingStatus(String bookId, String status) async {
+    final book = booksBox.get(bookId);
+    if (book != null) {
+      book.readingStatus = status;
+      await book.save();
+
+      final index = userLibrary.indexWhere((b) => b.id == bookId);
+      if (index != -1) {
+        userLibrary[index].readingStatus = status;
+        notifyListeners();
+      }
     }
   }
 }

@@ -36,6 +36,7 @@ class BooksHiveModelAdapter extends TypeAdapter<BooksHiveModel> {
       rating: fields[13] as int?,
       note: fields[14] as String?,
       favourite: fields[15] as bool? ?? false,
+      readingStatus: fields[16] as String? ?? 'Unread',
     );
   }
 
@@ -54,9 +55,29 @@ class BooksHiveModelAdapter extends TypeAdapter<BooksHiveModel> {
       ..writeByte(4)
       ..write(obj.thumbnail)
       ..writeByte(5)
-      ..write(obj.rating)
+      ..write(obj.addedAt.toIso8601String())
       ..writeByte(6)
-      ..write(obj.note);
+      ..write(obj.publishedDate)
+      ..writeByte(7)
+      ..write(obj.publisher)
+      ..writeByte(8)
+      ..write(obj.pageCount)
+      ..writeByte(9)
+      ..write(obj.mainCategory)
+      ..writeByte(10)
+      ..write(obj.category)
+      ..writeByte(11)
+      ..write(obj.language)
+      ..writeByte(12)
+      ..write(obj.isbn)
+      ..writeByte(13)
+      ..write(obj.rating)
+      ..writeByte(14)
+      ..write(obj.note)
+      ..writeByte(15)
+      ..write(obj.favourite)
+      ..writeByte(16)
+      ..write(obj.readingStatus);
   }
 
   @override

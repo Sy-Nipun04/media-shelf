@@ -36,23 +36,23 @@ class MyApp extends StatelessWidget {
 //Next steps:
 // 1. Create UI for the home page
 // 2. Implement a detailed view for each book with more information with notes and ratings
-// 3. (Done)Feature to add notes.
-// 4. Features to add ratings.
+// 3. Features to add ratings.
 // 4. Add filters for books in Library(favourites, read, to read)
-// 5. Pop Up info for search results
+// 4. (Done) Fix notes change not updating in the popup without refreshing.
+// 7. (Done) Pop Up info for search results
+// 3. (Done) Feature to add notes and favourites.
 
 //Ideas for the app:
-// 1. use apis from rawg, tmdb, google books to fetch data
+// 1. (Done)use apis from rawg, tmdb, google books to fetch data
 // 2. (Done using Hive, SP)use firebase to store data or store locally using hive and shared preferences
 // 3. add currently, playing movies, games, books
 // 4. add previously played movies, games, books
 // 5. (Done)add movies, games, books to your watch/play/read list
 // 6. (Done)add movie, game, book details page
 // 8. (Done)add movie, game, book search functionality
-// 9. add a favorites section
 // 10. add notes, reviews, ratings for movies, games, books
-// 11. add fliters for favorites, movies, games, books, etc
-// 12. add a profile page
-// 13. authentication with firebase
+// 11. add filters for favorites, movies, games, books, etc
+// 12. (For future)add a profile page
+// 13. (for future)authentication with firebase
 // 14. separate pages for books, games, movies
 // 15. (Advanced) add a recommendation system based on user preferences

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/books_provider.dart';
 import '../models/books_model.dart';
 import '../hive_models/books_hive_model.dart';
+import 'book info/book_details.dart';
 
 class SearchResultPage extends StatefulWidget {
   const SearchResultPage({super.key});
@@ -40,6 +41,9 @@ class _SearchResultPageState extends State<SearchResultPage> {
         itemBuilder: (context, index) {
           Book book = provider.searchResults[index];
           return ListTile(
+            onTap: () {
+              bookPopUpInfo(context, book, userLibrary, provider);
+            },
             leading:
                 book.thumbnail.isNotEmpty
                     ? Image.network(
@@ -89,6 +93,17 @@ class _SearchResultPageState extends State<SearchResultPage> {
                               description: book.description,
                               thumbnail: book.thumbnail,
                               addedAt: book.addedAt,
+                              publishedDate: book.publishedDate,
+                              publisher: book.publisher,
+                              pageCount: book.pageCount,
+                              mainCategory: book.mainCategory,
+                              category: book.category,
+                              language: book.language,
+                              isbn: book.isbn,
+                              rating: book.rating,
+                              note: book.note,
+                              favourite: book.favourite,
+                              readingStatus: book.readingStatus,
                             ),
                           );
                         },

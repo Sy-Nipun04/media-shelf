@@ -17,6 +17,7 @@ class Book {
   int? rating;
   String? note;
   bool favourite;
+  String readingStatus;
 
   Book({
     required this.id,
@@ -35,6 +36,7 @@ class Book {
     this.rating,
     this.note,
     this.favourite = false,
+    this.readingStatus = 'Unread',
   });
 
   factory Book.fromJson(Map<String, dynamic> json) {

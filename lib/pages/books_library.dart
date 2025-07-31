@@ -13,36 +13,10 @@ Future<void> saveLayoutSetting(bool isGrid) async {
   await prefs.setBool('isGridLayout', isGrid);
 }
 
-// Save sort option
-Future<void> saveSortOption(String sortOptionSelected) async {
-  final prefs = await SharedPreferences.getInstance();
-  await prefs.setString('sortOptionSelected', sortOptionSelected);
-}
-
-//load sort preference
-Future<void> saveSortSetting(String sortBy) async {
-  final prefs = await SharedPreferences.getInstance();
-  await prefs.setString('sortBy', sortBy);
-}
-
 // Load layout preference
 Future<bool> loadLayoutSetting() async {
   final prefs = await SharedPreferences.getInstance();
   return prefs.getBool('isGridLayout') ?? false; // default to list
-}
-
-// Load sort preference
-Future<String> loadSortOption() async {
-  final prefs = await SharedPreferences.getInstance();
-  return prefs.getString('sortOptionSelected') ??
-      'Recently Added'; // default to sort by recently added
-}
-
-// Load sort preference
-Future<String> loadSortSetting() async {
-  final prefs = await SharedPreferences.getInstance();
-  return prefs.getString('sortBy') ??
-      'Recently Added'; // default to sort by recently added
 }
 
 class LibraryScreen extends StatefulWidget {
@@ -55,7 +29,6 @@ class LibraryScreen extends StatefulWidget {
 class _LibraryScreenState extends State<LibraryScreen> {
   bool isGrid = false;
   Timer? _debounce;
-  String sortOptionSelected = 'Recently Added';
   Book? selectedBook;
 
   @override
@@ -66,19 +39,11 @@ class _LibraryScreenState extends State<LibraryScreen> {
         isGrid = value;
       });
     });
-    loadSortSetting().then((value) {
-      setState(() {
-        sortOptionSelected = value;
-      });
-    });
-    loadSortOption().then((value) {
-      setState(() {
-        sortOptionSelected = value;
-      });
-    });
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       final provider = Provider.of<BooksProvider>(context, listen: false);
-      provider.sortLibrary(sortOptionSelected);
+      await provider.loadSortPreference();
+      provider.sortLibrary(provider.sortOption);
+      provider.searchLibrary('');
     });
   }
 
@@ -86,9 +51,9 @@ class _LibraryScreenState extends State<LibraryScreen> {
   Widget build(BuildContext context) {
     final provider = Provider.of<BooksProvider>(context);
     final library =
-        provider.searchLibraryResults.isEmpty && provider.userLibrary.isNotEmpty
-            ? provider.userLibrary
-            : provider.searchLibraryResults;
+        provider.searchLibraryResults.isNotEmpty
+            ? provider.searchLibraryResults
+            : provider.userLibrary;
 
     return Scaffold(
       appBar: appBar1(context),
@@ -233,13 +198,11 @@ class _LibraryScreenState extends State<LibraryScreen> {
                     title: const Text('Recently Added'),
                     onTap: () {
                       setState(() {
-                        sortOptionSelected = 'Recently Added';
-                        provider.sortLibrary('Recently Added');
-                        saveSortSetting('Recently Added');
+                        provider.setSortOption('Recently Added');
                       });
                     },
                     trailing:
-                        sortOptionSelected == 'Recently Added'
+                        provider.sortOption == 'Recently Added'
                             ? const Icon(Icons.check, color: Colors.blue)
                             : null,
                   ),
@@ -248,13 +211,11 @@ class _LibraryScreenState extends State<LibraryScreen> {
                     title: const Text('Title'),
                     onTap: () {
                       setState(() {
-                        sortOptionSelected = 'Title';
-                        provider.sortLibrary('Title');
-                        saveSortSetting('Title');
+                        provider.setSortOption('Title');
                       });
                     },
                     trailing:
-                        sortOptionSelected == 'Title'
+                        provider.sortOption == 'Title'
                             ? const Icon(Icons.check, color: Colors.blue)
                             : null,
                   ),
@@ -263,13 +224,11 @@ class _LibraryScreenState extends State<LibraryScreen> {
                     title: const Text('Author'),
                     onTap: () {
                       setState(() {
-                        sortOptionSelected = 'Author';
-                        provider.sortLibrary('Author');
-                        saveSortSetting('Author');
+                        provider.setSortOption('Author');
                       });
                     },
                     trailing:
-                        sortOptionSelected == 'Author'
+                        provider.sortOption == 'Author'
                             ? const Icon(Icons.check, color: Colors.blue)
                             : null,
                   ),

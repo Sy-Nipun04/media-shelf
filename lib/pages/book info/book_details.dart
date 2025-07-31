@@ -7,6 +7,7 @@ import '../books_library.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../../hive_models/books_hive_model.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import '../../Widgets/star_rating.dart';
 
 Future<dynamic> bookPopUpInfo(
   BuildContext context,
@@ -95,25 +96,46 @@ Future<dynamic> bookPopUpInfo(
                   ],
                 ),
                 const SizedBox(height: 10),
-
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      children: List.generate(
-                        5,
-                        (index) => const Icon(
-                          Icons.star,
-                          color: Colors.orange,
-                          size: 20,
-                        ),
-                      ),
+                    Consumer<BooksProvider>(
+                      builder: (context, provider, child) {
+                        final isInLibrary = provider.userLibrary.any(
+                          (b) => b.id == book.id,
+                        );
+                        if (!isInLibrary) return const SizedBox.shrink();
+                        return Consumer<BooksProvider>(
+                          builder: (context, provider, child) {
+                            final updatedBook = provider.userLibrary.firstWhere(
+                              (b) => b.id == book.id,
+                              orElse: () => book,
+                            );
+
+                            return StarRating(
+                              rating:
+                                  updatedBook
+                                      .rating, // int? variable (null means no rating)
+                              onRatingChanged: (newRating) {
+                                provider.updateBookRating(book.id, newRating);
+                              },
+                            );
+                          },
+                        );
+                      },
                     ),
                     Consumer<BooksProvider>(
                       builder: (context, provider, child) {
-                        final isFavourite = userLibrary.any(
+                        final isInLibrary = provider.userLibrary.any(
+                          (b) => b.id == book.id,
+                        );
+
+                        if (!isInLibrary) return const SizedBox.shrink();
+
+                        final isFavourite = provider.userLibrary.any(
                           (b) => b.id == book.id && b.favourite,
                         );
+
                         return Container(
                           height: 30,
                           width: 30,
@@ -132,17 +154,16 @@ Future<dynamic> bookPopUpInfo(
                               size: 20,
                             ),
                             onPressed: () {
-                              isFavourite
-                                  ? provider.toggleFavorite(book)
-                                  : provider.toggleFavorite(book);
+                              provider.toggleFavorite(book);
                             },
                           ),
                         );
                       },
                     ),
+
                     Consumer<BooksProvider>(
                       builder: (context, provider, child) {
-                        final isInLibrary = userLibrary.any(
+                        final isInLibrary = provider.userLibrary.any(
                           (b) => b.id == book.id,
                         );
                         return Container(
@@ -225,11 +246,136 @@ Future<dynamic> bookPopUpInfo(
                                     description: book.description,
                                     thumbnail: book.thumbnail,
                                     addedAt: book.addedAt,
+                                    publishedDate: book.publishedDate,
+                                    publisher: book.publisher,
+                                    pageCount: book.pageCount,
+                                    mainCategory: book.mainCategory,
+                                    category: book.category,
+                                    language: book.language,
+                                    isbn: book.isbn,
+                                    rating: null,
+                                    note: null,
+                                    favourite: false,
+                                    readingStatus: 'Unread',
                                   ),
                                 );
                               }
                             },
                           ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+                Consumer<BooksProvider>(
+                  builder: (context, provider, child) {
+                    final isInLibrary = provider.userLibrary.any(
+                      (b) => b.id == book.id,
+                    );
+                    if (!isInLibrary) return const SizedBox.shrink();
+                    return const SizedBox(height: 10);
+                  },
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Consumer<BooksProvider>(
+                      builder: (context, provider, child) {
+                        final isInLibrary = provider.userLibrary.any(
+                          (b) => b.id == book.id,
+                        );
+                        if (!isInLibrary) return const SizedBox.shrink();
+
+                        final updatedBook = provider.userLibrary.firstWhere(
+                          (b) => b.id == book.id,
+                          orElse: () => book,
+                        );
+
+                        String selectedOption =
+                            updatedBook.readingStatus ?? 'Unread';
+
+                        return StatefulBuilder(
+                          builder: (context, setState) {
+                            return Container(
+                              height: 30,
+                              width: 120,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                              ),
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color:
+                                      selectedOption == 'Reading'
+                                          ? Colors.blue
+                                          : (selectedOption == 'To Read'
+                                              ? Colors.orange
+                                              : (selectedOption == 'Read'
+                                                  ? Colors.green
+                                                  : Colors.grey)),
+                                ),
+                                borderRadius: BorderRadius.circular(7),
+                              ),
+                              child: DropdownButton<String>(
+                                value: selectedOption,
+                                isExpanded: true,
+                                underline: const SizedBox(),
+                                icon: const SizedBox.shrink(),
+                                items:
+                                    [
+                                      'Reading',
+                                      'To Read',
+                                      'Read',
+                                      'Unread',
+                                    ].map((String option) {
+                                      return DropdownMenuItem<String>(
+                                        value: option,
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              Icons.circle,
+                                              size: 15,
+                                              color:
+                                                  option == 'Reading'
+                                                      ? Colors.blue
+                                                      : (option == 'To Read'
+                                                          ? Colors.orange
+                                                          : (option == 'Read'
+                                                              ? Colors.green
+                                                              : Colors.grey)),
+                                            ),
+                                            const SizedBox(width: 10),
+                                            Text(
+                                              option,
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color:
+                                                    option == 'Reading'
+                                                        ? Colors.blue[600]
+                                                        : (option == 'To Read'
+                                                            ? Colors.orange[600]
+                                                            : (option == 'Read'
+                                                                ? Colors
+                                                                    .green[600]
+                                                                : Colors
+                                                                    .grey[600])),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    }).toList(),
+                                onChanged: (String? newValue) {
+                                  setState(() {
+                                    selectedOption = newValue!;
+                                  });
+                                  provider.updateBookReadingStatus(
+                                    book.id,
+                                    selectedOption,
+                                  );
+                                },
+                              ),
+                            );
+                          },
                         );
                       },
                     ),
@@ -279,70 +425,89 @@ Future<dynamic> bookPopUpInfo(
                     ],
                   ),
                 ),
-                const SizedBox(height: 12),
 
+                Consumer<BooksProvider>(
+                  builder: (context, provider, child) {
+                    final isInLibrary = provider.userLibrary.any(
+                      (b) => b.id == book.id,
+                    );
+                    if (!isInLibrary) return const SizedBox.shrink();
+                    return const SizedBox(height: 12);
+                  },
+                ),
                 //  Notes
-                Container(
-                  constraints: BoxConstraints(
-                    maxHeight: 120,
-                    maxWidth: double.infinity,
-                  ),
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey.shade300),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          const Text(
-                            "Your Sticky Note",
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          GestureDetector(
-                            onTap: () {
-                              addNoteDialog(context, book, provider);
-                            },
-                            child: const Icon(
-                              Icons.edit,
-                              size: 15,
-                              color: Colors.blue,
-                            ),
-                          ),
-                        ],
+                Consumer<BooksProvider>(
+                  builder: (context, provider, child) {
+                    final isInLibrary = provider.userLibrary.any(
+                      (b) => b.id == book.id,
+                    );
+
+                    if (!isInLibrary) return const SizedBox.shrink();
+
+                    final updatedBook = provider.userLibrary.firstWhere(
+                      (b) => b.id == book.id,
+                      orElse: () => book,
+                    );
+
+                    return Container(
+                      constraints: const BoxConstraints(
+                        maxHeight: 120,
+                        maxWidth: double.infinity,
                       ),
-                      const SizedBox(height: 10),
-                      Flexible(
-                        child: SingleChildScrollView(
-                          physics: const ClampingScrollPhysics(),
-                          child: Consumer<BooksProvider>(
-                            builder: (context, provider, child) {
-                              return Text(
-                                book.note?.isNotEmpty == true
-                                    ? book.note!
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade300),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              const Text(
+                                "Your Sticky Note",
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              GestureDetector(
+                                onTap: () {
+                                  addNoteDialog(context, updatedBook, provider);
+                                },
+                                child: const Icon(
+                                  Icons.edit,
+                                  size: 15,
+                                  color: Colors.blue,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          Flexible(
+                            child: SingleChildScrollView(
+                              physics: const ClampingScrollPhysics(),
+                              child: Text(
+                                updatedBook.note?.isNotEmpty == true
+                                    ? updatedBook.note!
                                     : 'Add a note here...',
                                 style: TextStyle(
                                   fontSize: 12,
                                   color:
-                                      book.note?.isNotEmpty == true
+                                      updatedBook.note?.isNotEmpty == true
                                           ? Colors.black
                                           : Colors.grey,
                                 ),
-                              );
-                            },
+                              ),
+                            ),
                           ),
-                        ),
+                        ],
                       ),
-                    ],
-                  ),
+                    );
+                  },
                 ),
+
                 const SizedBox(height: 20),
 
                 // Buttons
@@ -350,6 +515,7 @@ Future<dynamic> bookPopUpInfo(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(elevation: 0),
                       onPressed: () {
                         Navigator.push(
                           context,
@@ -366,6 +532,7 @@ Future<dynamic> bookPopUpInfo(
                       ),
                     ),
                     ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(elevation: 0),
                       onPressed: () => Navigator.of(context).pop(),
                       icon: const Icon(Icons.close, color: Colors.blue),
                       label: const Text(

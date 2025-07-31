@@ -52,6 +52,9 @@ class BooksHiveModel extends HiveObject {
   @HiveField(14)
   bool favourite = false;
 
+  @HiveField(15)
+  String readingStatus = 'Unread';
+
   BooksHiveModel({
     required this.id,
     required this.title,
@@ -69,5 +72,6 @@ class BooksHiveModel extends HiveObject {
     this.rating,
     this.note,
     this.favourite = false,
+    this.readingStatus = 'Unread',
   });
 }

@@ -43,16 +43,16 @@ class BooksHiveModel extends HiveObject {
   @HiveField(12)
   List<String> isbn;
 
-  @HiveField(12)
+  @HiveField(13)
   int? rating;
 
-  @HiveField(13)
+  @HiveField(14)
   String? note;
 
-  @HiveField(14)
+  @HiveField(15)
   bool favourite = false;
 
-  @HiveField(15)
+  @HiveField(16)
   String readingStatus = 'Unread';
 
   BooksHiveModel({

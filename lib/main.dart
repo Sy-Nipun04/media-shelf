@@ -36,6 +36,7 @@ class MyApp extends StatelessWidget {
 //Next steps:
 // 1. Create UI for the home page
 // 2. Implement a detailed view for each book with more information with notes and ratings
+// 3. implement recommendation system based on user preferences
 // 3. (Done)Features to add ratings.
 // 4. (Done)Add filters for books in Library(favourites, read, to read)
 // 4. (Done) Fix notes change not updating in the popup without refreshing.

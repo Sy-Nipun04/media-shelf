@@ -43,7 +43,7 @@ class BooksHiveModelAdapter extends TypeAdapter<BooksHiveModel> {
   @override
   void write(BinaryWriter writer, BooksHiveModel obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(17)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)

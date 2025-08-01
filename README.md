@@ -33,4 +33,3 @@ mark favorites, and write notes – all stored locally using Hive for offline ac
      
    ```bash
    git clone https://github.com/Sy-Nipun04/media-shelf.git
-   cd media-shelf

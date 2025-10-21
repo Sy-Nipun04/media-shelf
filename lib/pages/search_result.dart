@@ -70,12 +70,23 @@ class _SearchResultPageState extends State<SearchResultPage> {
             trailing:
                 (!userLibrary.any((b) => b.id == book.id))
                     ? Container(
+                      height: 36,
+                      width: 36,
                       decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        borderRadius: BorderRadius.circular(5),
+                        color: Colors.grey[100],
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: Colors.grey[300]!,
+                          width: 1.5,
+                        ),
                       ),
                       child: IconButton(
-                        icon: const Icon(Icons.add),
+                        padding: EdgeInsets.zero,
+                        icon: Icon(
+                          Icons.add,
+                          color: Colors.grey[600],
+                          size: 20,
+                        ),
                         onPressed: () {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
@@ -110,12 +121,23 @@ class _SearchResultPageState extends State<SearchResultPage> {
                       ),
                     )
                     : Container(
+                      height: 36,
+                      width: 36,
                       decoration: BoxDecoration(
-                        color: Colors.green[200],
-                        borderRadius: BorderRadius.circular(5),
+                        color: Colors.green[50],
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: Colors.green[400]!,
+                          width: 1.5,
+                        ),
                       ),
                       child: IconButton(
-                        icon: const Icon(Icons.check),
+                        padding: EdgeInsets.zero,
+                        icon: Icon(
+                          Icons.check,
+                          color: Colors.green[700],
+                          size: 20,
+                        ),
                         onPressed: () async {
                           final confirm = await showDialog(
                             context: context,

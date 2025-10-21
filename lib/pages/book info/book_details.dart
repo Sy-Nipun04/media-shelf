@@ -19,16 +19,17 @@ Future<dynamic> bookPopUpInfo(
     barrierDismissible: true,
     builder: (context) {
       return Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         backgroundColor: Colors.white,
+        elevation: 10,
         insetPadding: const EdgeInsets.all(20),
         child: SingleChildScrollView(
           child: Padding(
             padding: EdgeInsets.only(
-              left: 20,
-              right: 20,
-              top: 20,
-              bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+              left: 24,
+              right: 24,
+              top: 24,
+              bottom: MediaQuery.of(context).viewInsets.bottom + 24,
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -38,33 +39,55 @@ Future<dynamic> bookPopUpInfo(
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: CachedNetworkImage(
-                        imageUrl: book.thumbnail,
-                        width: 80,
-                        height: 120,
-                        fit: BoxFit.cover,
-                        placeholder:
-                            (context, url) => const Center(
-                              child: CircularProgressIndicator(),
-                            ),
-                        errorWidget:
-                            (context, url, error) => Container(
-                              height: 120,
-                              width: 80,
-                              color: Colors.grey[300],
-                              child: const Center(
-                                child: Icon(
-                                  Icons.broken_image,
-                                  size: 30,
-                                  color: Colors.grey,
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.15),
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: CachedNetworkImage(
+                          imageUrl: book.thumbnail.replaceAll(
+                            'http:',
+                            'https:',
+                          ),
+                          width: 90,
+                          height: 135,
+                          fit: BoxFit.cover,
+                          placeholder:
+                              (context, url) => Container(
+                                width: 90,
+                                height: 135,
+                                color: Colors.grey[200],
+                                child: const Center(
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
                                 ),
                               ),
-                            ),
+                          errorWidget:
+                              (context, url, error) => Container(
+                                height: 135,
+                                width: 90,
+                                color: Colors.grey[300],
+                                child: const Center(
+                                  child: Icon(
+                                    Icons.book_outlined,
+                                    size: 40,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ),
+                        ),
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 16),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -72,29 +95,42 @@ Future<dynamic> bookPopUpInfo(
                           Text(
                             book.title,
                             style: const TextStyle(
-                              fontSize: 17,
+                              fontSize: 18,
                               fontWeight: FontWeight.bold,
                               fontFamily: 'Poppins',
+                              height: 1.3,
                             ),
                             maxLines: 3,
                             overflow: TextOverflow.ellipsis,
                           ),
-                          const SizedBox(height: 10),
-                          Text(
-                            book.authors.join(', '),
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey[600],
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            maxLines: 3,
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.person_outline,
+                                size: 16,
+                                color: Colors.grey[600],
+                              ),
+                              const SizedBox(width: 4),
+                              Expanded(
+                                child: Text(
+                                  book.authors.join(', '),
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: Colors.grey[600],
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  maxLines: 2,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 16),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -136,20 +172,28 @@ Future<dynamic> bookPopUpInfo(
                         );
 
                         return Container(
-                          height: 30,
-                          width: 30,
+                          height: 36,
+                          width: 36,
                           decoration: BoxDecoration(
                             color:
                                 isFavourite
                                     ? const Color.fromARGB(255, 255, 183, 0)
-                                    : Colors.grey[200],
-                            borderRadius: BorderRadius.circular(5),
+                                    : Colors.grey[100],
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color:
+                                  isFavourite
+                                      ? const Color.fromARGB(255, 255, 183, 0)
+                                      : Colors.grey[300]!,
+                              width: 1.5,
+                            ),
                           ),
                           child: IconButton(
                             padding: EdgeInsets.zero,
                             icon: Icon(
                               Icons.star,
-                              color: isFavourite ? Colors.white : Colors.grey,
+                              color:
+                                  isFavourite ? Colors.white : Colors.grey[400],
                               size: 20,
                             ),
                             onPressed: () {
@@ -166,19 +210,30 @@ Future<dynamic> bookPopUpInfo(
                           (b) => b.id == book.id,
                         );
                         return Container(
-                          height: 30,
-                          width: 30,
+                          height: 36,
+                          width: 36,
                           decoration: BoxDecoration(
                             color:
                                 isInLibrary
-                                    ? Colors.green[200]
-                                    : Colors.grey[200],
-                            borderRadius: BorderRadius.circular(5),
+                                    ? Colors.green[50]
+                                    : Colors.grey[100],
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color:
+                                  isInLibrary
+                                      ? Colors.green[400]!
+                                      : Colors.grey[300]!,
+                              width: 1.5,
+                            ),
                           ),
                           child: IconButton(
                             padding: EdgeInsets.zero,
                             icon: Icon(
                               isInLibrary ? Icons.check : Icons.add,
+                              color:
+                                  isInLibrary
+                                      ? Colors.green[700]
+                                      : Colors.grey[600],
                               size: 20,
                             ),
                             onPressed: () async {
@@ -272,7 +327,7 @@ Future<dynamic> bookPopUpInfo(
                       (b) => b.id == book.id,
                     );
                     if (!isInLibrary) return const SizedBox.shrink();
-                    return const SizedBox(height: 10);
+                    return const SizedBox(height: 14);
                   },
                 ),
                 Row(
@@ -295,29 +350,53 @@ Future<dynamic> bookPopUpInfo(
                         return StatefulBuilder(
                           builder: (context, setState) {
                             return Container(
-                              height: 30,
-                              width: 120,
+                              height: 36,
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
+                                horizontal: 14,
                               ),
                               decoration: BoxDecoration(
+                                color: Colors.white,
                                 border: Border.all(
                                   color:
                                       selectedOption == 'Reading'
-                                          ? Colors.blue
+                                          ? Colors.blue[300]!
                                           : (selectedOption == 'To Read'
-                                              ? Colors.orange
+                                              ? Colors.orange[300]!
                                               : (selectedOption == 'Read'
-                                                  ? Colors.green
-                                                  : Colors.grey)),
+                                                  ? Colors.green[300]!
+                                                  : Colors.grey[300]!)),
+                                  width: 2,
                                 ),
-                                borderRadius: BorderRadius.circular(7),
+                                borderRadius: BorderRadius.circular(10),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: (selectedOption == 'Reading'
+                                            ? Colors.blue
+                                            : (selectedOption == 'To Read'
+                                                ? Colors.orange
+                                                : (selectedOption == 'Read'
+                                                    ? Colors.green
+                                                    : Colors.grey)))
+                                        .withOpacity(0.1),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
                               ),
                               child: DropdownButton<String>(
                                 value: selectedOption,
-                                isExpanded: true,
                                 underline: const SizedBox(),
-                                icon: const SizedBox.shrink(),
+                                icon: Icon(
+                                  Icons.arrow_drop_down,
+                                  color:
+                                      selectedOption == 'Reading'
+                                          ? Colors.blue[600]
+                                          : (selectedOption == 'To Read'
+                                              ? Colors.orange[600]
+                                              : (selectedOption == 'Read'
+                                                  ? Colors.green[600]
+                                                  : Colors.grey[600])),
+                                ),
                                 items:
                                     [
                                       'Reading',
@@ -379,28 +458,40 @@ Future<dynamic> bookPopUpInfo(
                     ),
                   ],
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 16),
 
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.all(8),
-                  constraints: BoxConstraints(
-                    maxHeight: 135,
+                  padding: const EdgeInsets.all(14),
+                  constraints: const BoxConstraints(
+                    maxHeight: 150,
                     maxWidth: double.infinity,
                   ),
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey.shade300),
-                    borderRadius: BorderRadius.circular(8),
+                    color: Colors.grey[50],
+                    border: Border.all(color: Colors.grey.shade200, width: 1.5),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        "Description",
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.description_outlined,
+                            size: 16,
+                            color: Colors.grey[700],
+                          ),
+                          const SizedBox(width: 6),
+                          const Text(
+                            "Description",
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 0.3,
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 10),
                       Flexible(
@@ -408,14 +499,15 @@ Future<dynamic> bookPopUpInfo(
                           physics: const ClampingScrollPhysics(),
                           child: Text(
                             (book.description.isEmpty)
-                                ? 'No description'
+                                ? 'No description available'
                                 : book.description,
                             style: TextStyle(
                               fontSize: 12,
                               color:
                                   (book.description.isEmpty)
-                                      ? Colors.grey
-                                      : Colors.black,
+                                      ? Colors.grey[500]
+                                      : Colors.black87,
+                              height: 1.5,
                             ),
                           ),
                         ),
@@ -430,7 +522,7 @@ Future<dynamic> bookPopUpInfo(
                       (b) => b.id == book.id,
                     );
                     if (!isInLibrary) return const SizedBox.shrink();
-                    return const SizedBox(height: 12);
+                    return const SizedBox(height: 14);
                   },
                 ),
                 //  Notes
@@ -449,35 +541,53 @@ Future<dynamic> bookPopUpInfo(
 
                     return Container(
                       constraints: const BoxConstraints(
-                        maxHeight: 120,
+                        maxHeight: 130,
                         maxWidth: double.infinity,
                       ),
-                      padding: const EdgeInsets.all(8),
+                      padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey.shade300),
-                        borderRadius: BorderRadius.circular(8),
+                        color: const Color(0xFFFFF9E6),
+                        border: Border.all(
+                          color: Colors.amber[200]!,
+                          width: 1.5,
+                        ),
+                        borderRadius: BorderRadius.circular(12),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
                             children: [
+                              Icon(
+                                Icons.sticky_note_2_outlined,
+                                size: 16,
+                                color: Colors.amber[800],
+                              ),
+                              const SizedBox(width: 6),
                               const Text(
                                 "Your Sticky Note",
                                 style: TextStyle(
-                                  fontSize: 12,
+                                  fontSize: 13,
                                   fontWeight: FontWeight.bold,
+                                  letterSpacing: 0.3,
                                 ),
                               ),
-                              const SizedBox(width: 10),
+                              const Spacer(),
                               GestureDetector(
                                 onTap: () {
                                   addNoteDialog(context, updatedBook, provider);
                                 },
-                                child: const Icon(
-                                  Icons.edit,
-                                  size: 15,
-                                  color: Colors.blue,
+                                child: Container(
+                                  padding: const EdgeInsets.all(4),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Icon(
+                                    Icons.edit,
+                                    size: 16,
+                                    color: Colors.amber[800],
+                                  ),
                                 ),
                               ),
                             ],
@@ -489,13 +599,14 @@ Future<dynamic> bookPopUpInfo(
                               child: Text(
                                 updatedBook.note?.isNotEmpty == true
                                     ? updatedBook.note!
-                                    : 'Add a note here...',
+                                    : 'Tap the edit icon to add your personal notes...',
                                 style: TextStyle(
                                   fontSize: 12,
                                   color:
                                       updatedBook.note?.isNotEmpty == true
-                                          ? Colors.black
-                                          : Colors.grey,
+                                          ? Colors.black87
+                                          : Colors.grey[600],
+                                  height: 1.5,
                                 ),
                               ),
                             ),
@@ -506,36 +617,62 @@ Future<dynamic> bookPopUpInfo(
                   },
                 ),
 
-                const SizedBox(height: 20),
+                const SizedBox(height: 24),
 
                 // Buttons
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(elevation: 0),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder:
-                                (context) => BookInfoPage(selectedBook: book),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          elevation: 0,
+                          backgroundColor: Colors.blue[50],
+                          foregroundColor: Colors.blue[700],
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                        );
-                      },
-                      icon: const Icon(Icons.info, color: Colors.blue),
-                      label: const Text(
-                        "More Info",
-                        style: TextStyle(fontSize: 11, color: Colors.blue),
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => BookInfoPage(selectedBook: book),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.info_outline, size: 20),
+                        label: const Text(
+                          "More Info",
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
                     ),
-                    ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(elevation: 0),
-                      onPressed: () => Navigator.of(context).pop(),
-                      icon: const Icon(Icons.close, color: Colors.blue),
-                      label: const Text(
-                        "Close",
-                        style: TextStyle(fontSize: 11, color: Colors.blue),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          elevation: 0,
+                          backgroundColor: Colors.grey[100],
+                          foregroundColor: Colors.grey[700],
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        onPressed: () => Navigator.of(context).pop(),
+                        icon: const Icon(Icons.close, size: 20),
+                        label: const Text(
+                          "Close",
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
                     ),
                   ],
@@ -855,24 +992,42 @@ class _BookInfoPageState extends State<BookInfoPage> {
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor:
                                         isInLibrary
-                                            ? Colors.green
-                                            : Colors.blue,
+                                            ? Colors.green[600]
+                                            : Colors.blue[600],
                                     foregroundColor: Colors.white,
                                     padding: const EdgeInsets.symmetric(
-                                      horizontal: 24,
-                                      vertical: 12,
+                                      horizontal: 32,
+                                      vertical: 16,
                                     ),
+                                    elevation: isInLibrary ? 0 : 4,
+                                    shadowColor:
+                                        isInLibrary
+                                            ? Colors.transparent
+                                            : Colors.blue.withOpacity(0.4),
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(25),
+                                      borderRadius: BorderRadius.circular(16),
                                     ),
                                   ),
-                                  icon: Icon(
-                                    isInLibrary ? Icons.check : Icons.add,
+                                  icon: Container(
+                                    padding: const EdgeInsets.all(4),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.2),
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    child: Icon(
+                                      isInLibrary ? Icons.check : Icons.add,
+                                      size: 20,
+                                    ),
                                   ),
                                   label: Text(
                                     isInLibrary
                                         ? 'In Library'
                                         : 'Add to Library',
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      letterSpacing: 0.3,
+                                    ),
                                   ),
                                 ),
                                 if (isInLibrary) ...[
@@ -1155,32 +1310,86 @@ class _BookInfoPageState extends State<BookInfoPage> {
                   const SizedBox(height: 10),
 
                   // Description Section
-                  const Text(
-                    'Description',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.blue[50],
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Icon(
+                          Icons.description_outlined,
+                          size: 20,
+                          color: Colors.blue[700],
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      const Text(
+                        'About this Book',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.3,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 16),
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: Colors.grey[100],
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      selectedBook.description.isEmpty
-                          ? 'No description available for this book.'
-                          : selectedBook.description,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color:
-                            selectedBook.description.isEmpty
-                                ? Colors.grey[600]
-                                : Colors.black87,
-                        height: 1.6,
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Colors.blue[50]!.withOpacity(0.3),
+                          Colors.purple[50]!.withOpacity(0.2),
+                        ],
                       ),
-                      textAlign: TextAlign.justify,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.blue[100]!, width: 1.5),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.blue.withOpacity(0.08),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                     ),
+                    child:
+                        selectedBook.description.isEmpty
+                            ? Row(
+                              children: [
+                                Icon(
+                                  Icons.info_outline,
+                                  size: 20,
+                                  color: Colors.grey[500],
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    'No description available for this book.',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey[600],
+                                      fontStyle: FontStyle.italic,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            )
+                            : Text(
+                              selectedBook.description,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Colors.black87,
+                                height: 1.7,
+                                letterSpacing: 0.2,
+                              ),
+                              textAlign: TextAlign.justify,
+                            ),
                   ),
 
                   const SizedBox(height: 20),

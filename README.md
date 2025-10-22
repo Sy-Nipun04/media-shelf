@@ -98,5 +98,3 @@ Repository: [media-shelf](https://github.com/Sy-Nipun04/media-shelf)
 ## 📧 Support
 
 Questions or issues? Open an issue on GitHub.
-
----

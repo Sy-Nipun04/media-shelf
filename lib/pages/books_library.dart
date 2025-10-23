@@ -1095,7 +1095,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
         'Your Library',
         style: TextStyle(
           color: Colors.black87,
-          fontSize: 24,
+          fontSize: 18,
           fontWeight: FontWeight.bold,
         ),
       ),

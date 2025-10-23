@@ -30,7 +30,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
           style: TextStyle(
             color: Colors.black87,
             fontWeight: FontWeight.bold,
-            fontSize: 24,
+            fontSize: 18,
           ),
         ),
         iconTheme: const IconThemeData(color: Colors.black87),

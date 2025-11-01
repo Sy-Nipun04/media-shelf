@@ -104,7 +104,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
             margin: const EdgeInsets.only(bottom: 12),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(2),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.04),
@@ -142,7 +142,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
                             ],
                           ),
                           child: ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(2),
                             child:
                                 book.thumbnail.isNotEmpty
                                     ? Image.network(
